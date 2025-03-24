@@ -102,7 +102,3 @@ If the user wants to end the consultation, change the consultation step to the e
 -   "userResponse": 사용자가 보낸 요청을 적어줘
 -   "therapistNotes": 치료사가 상담 내용을 요약하거나 중요한 관찰 내용을 기록하는 필드입니다.
 -   "defaultResponse": 질문을 제외한 나머지의 부분에 대한 공감이나 일반적인 CBT 답변을 진행해줘
-
-## User Request Question
-
--   Question : %s
