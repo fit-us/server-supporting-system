@@ -1,11 +1,9 @@
 from langchain.memory import ConversationBufferMemory
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.schema import HumanMessage, AIMessage
-from dataclasses import dataclass
+from langchain.schema import HumanMessage, AIMessage, SystemMessage
 from utils.markdown_utils import MarkdownReader
 from config import Config
 
-@dataclass
 class CBTBotLLM:
     llm: ChatGoogleGenerativeAI
     prompt: str
@@ -24,7 +22,7 @@ class CBTBotLLM:
     def invoke(self, message: str):
         # 기억된 대화를 포함하여 모델에 전달
 
-        messages = [HumanMessage(content=self.prompt, role="system")]
+        messages = [SystemMessage(content=self.prompt, role="system")]
         messages.extend([AIMessage(content=m.content, role=m.type) for m in self.memory.chat_memory.messages])
         messages.append(HumanMessage(content=message, role="user"))
 
