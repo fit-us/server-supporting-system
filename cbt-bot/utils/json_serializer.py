@@ -7,6 +7,8 @@ class JsonSerializer:
     
     @staticmethod
     def from_json(data_type, json_str):
+        if not isinstance(data_type, type):
+            raise TypeError("data_type must be a class.")     
         try:
             if json_str.startswith("```json"):
                 json_str = json_str[7:]
