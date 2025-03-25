@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package cbt_bot;
+
+service CBTBotService {
+    rpc Chat (ChatRequest) returns (ChatResponse);
+}
+
+message ChatRequest {
+    string message = 1;
+}
+
+message ChatResponse {
+    CBTBotResponse cbtDetails = 1;
+}
+
+message CBTBotResponse {
+    string cbtCategory = 1;
+    string consultationStage = 2;
+    string triggeringSituation = 3;
+    string automaticThoughts = 4;
+    repeated string emotions = 5;
+    map<string, int32> intensityOfEmotion = 6;
+    string underlyingBeliefs = 7;
+    repeated string cbtQuestion = 8;
+    string userResponse = 9;
+    string therapistNotes = 10;
+    string defaultResponse = 11;
+}
