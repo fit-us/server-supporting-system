@@ -27,10 +27,12 @@ class CBTBot:
         messages = [HumanMessage(content=self.prompt, role="system")]
         messages.extend([AIMessage(content=m.content, role=m.type) for m in self.memory.chat_memory.messages])
         messages.append(HumanMessage(content=message, role="user"))
-        
+
         response = self.llm.invoke(messages)
 
-        # 대화 내용을 메모리에 저장
-        self.memory.save_context({"input": message}, {"output": response.content})
-
+        try:
+            self.memory.save_context({"input": message}, {"output": response.content})
+        except Exception as e:
+            print(f"Error saving context: {e}")
+        
         return response
