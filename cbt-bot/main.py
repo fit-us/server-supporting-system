@@ -1,34 +1,7 @@
-from langchain.memory import ConversationBufferMemory
-from langchain_google_genai import ChatGoogleGenerativeAI
-from dataclasses import dataclass
-from markdown_utils import MarkdownReader
-from config import Config
-from langchain.schema import HumanMessage, AIMessage
-
-@dataclass
-class CBTBot:
-    llm: ChatGoogleGenerativeAI
-    prompt: str
-    
-    def __init__(self):
-        self.llm = ChatGoogleGenerativeAI(
-            model=Config.MODEL,
-            temperature=Config.TEMPERATURE,
-            max_output_tokens=Config.MAX_OUTPUT_TOKENS,
-            google_api_key=Config.GOOGLE_API_KEY
-        )
-        self.prompt = MarkdownReader.read_file(Config.PROMPT_PATH)
-    
-    def invoke(self, message: str):
-        # 기억된 대화를 포함하여 모델에 전달
-        messages = [{"role": "system", "content": self.prompt}]
-        messages.append({"role": "user", "content": message})
-        response = self.llm.invoke(messages)
-
-        return response
+from cbt_bot_llm import CBTBotLLM
 
 if __name__ == "__main__":
-    bot = CBTBot()
+    bot = CBTBotLLM()
 
     while True:
         # 사용자로부터 메시지 입력 받기
