@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package cbt_bot;
+
+// gRPC 서비스 정의
+service CBTBotService {
+  rpc Chat (ChatRequest) returns (ChatResponse);
+}
+
+// 요청 메시지
+message ChatRequest {
+  string message = 1;
+}
+
+// 응답 메시지
+message ChatResponse {
+  string response = 1;
+}
