@@ -9,21 +9,26 @@ class CBTBotServicer(cbt_bot_llm_pb2_grpc.CBTBotServiceServicer):
         self.bot = CBTBotLLM()
 
     def Chat(self, request, context):
-        response = self.bot.invoke(request.message)
-        cbt_response = cbt_bot_llm_pb2.CBTBotResponse(
-            cbtCategory=response.cbt_category,
-            consultationStage=response.consultation_stage,
-            triggeringSituation=response.triggering_situation,
-            automaticThoughts=response.automatic_thoughts,
-            emotions=response.emotions,
-            intensityOfEmotion=response.intensity_of_emotion,
-            underlyingBeliefs=response.underlying_beliefs,
-            cbtQuestion=response.cbt_question,
-            userResponse=response.user_response,
-            therapistNotes=response.therapist_notes,
-            defaultResponse=response.default_response
-        )
-        return cbt_bot_llm_pb2.ChatResponse(cbtDetails=cbt_response)
+        try:
+            response = self.bot.invoke(request.message)
+            cbt_response = cbt_bot_llm_pb2.CBTBotResponse(
+                cbtCategory=response.cbt_category,
+                consultationStage=response.consultation_stage,
+                triggeringSituation=response.triggering_situation,
+                automaticThoughts=response.automatic_thoughts,
+                emotions=response.emotions,
+                intensityOfEmotion=response.intensity_of_emotion,
+                underlyingBeliefs=response.underlying_beliefs,
+                cbtQuestion=response.cbt_question,
+                userResponse=response.user_response,
+                therapistNotes=response.therapist_notes,
+                defaultResponse=response.default_response
+            )
+            return cbt_bot_llm_pb2.ChatResponse(cbtDetails=cbt_response)
+        except Exception as e:
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(str(e))
+            return cbt_bot_llm_pb2.ChatResponse()
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))  # 최대 10개 동시 처리
