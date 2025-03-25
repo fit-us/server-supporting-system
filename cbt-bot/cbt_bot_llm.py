@@ -35,4 +35,4 @@ class CBTBotLLM:
         except Exception as e:
             print(f"Error saving context: {e}")
         print(response.content)
-        return CBTBotResponse(**JsonSerializer.from_json(response.content))
+        return JsonSerializer.from_json(CBTBotResponse, response.content)
