@@ -3,6 +3,8 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
 from utils.markdown_utils import MarkdownReader
 from config import Config
+from utils.json_serializer import JsonSerializer
+from cbt_bot_model import CBTBotResponse
 
 class CBTBotLLM:
     llm: ChatGoogleGenerativeAI
@@ -32,5 +34,5 @@ class CBTBotLLM:
             self.memory.save_context({"input": message}, {"output": response.content})
         except Exception as e:
             print(f"Error saving context: {e}")
-        
-        return response
+        print(response.content)
+        return JsonSerializer.from_json(CBTBotResponse, response.content)

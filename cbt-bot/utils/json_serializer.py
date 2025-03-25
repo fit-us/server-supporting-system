@@ -6,12 +6,14 @@ class JsonSerializer:
         return json.dumps(obj)
     
     @staticmethod
-    def from_json(json_str):
+    def from_json(data_type, json_str):
+        if not isinstance(data_type, type):
+            raise TypeError("data_type must be a class.")     
         try:
             if json_str.startswith("```json"):
                 json_str = json_str[7:]
             if json_str.endswith("```"):
                 json_str = json_str[:-3]
-            return  json.loads(json_str.strip())
+            return  data_type(**json.loads(json_str.strip()))
         except json.JSONDecodeError as e:
             print(f"JSON 디코딩 오류: {e}")
