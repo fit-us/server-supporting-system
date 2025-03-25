@@ -1,7 +1,7 @@
-from cbt_bot_llm import CBTBot
+from cbt_bot_llm import CBTBotLLM
 
 if __name__ == "__main__":
-    bot = CBTBot()
+    bot = CBTBotLLM()
 
     while True:
         # 사용자로부터 메시지 입력 받기

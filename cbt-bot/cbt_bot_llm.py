@@ -6,7 +6,7 @@ from utils.markdown_utils import MarkdownReader
 from config import Config
 
 @dataclass
-class CBTBot:
+class CBTBotLLM:
     llm: ChatGoogleGenerativeAI
     prompt: str
     memory: ConversationBufferMemory
