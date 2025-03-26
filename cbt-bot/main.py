@@ -10,7 +10,7 @@ class CBTBotServicer(cbt_bot_llm_pb2_grpc.CBTBotServiceServicer):
 
     def Chat(self, request, context):
         try:
-            response = self.bot.invoke(request.message)
+            response = self.bot.invoke(request.user_id, request.message)
             cbt_response = cbt_bot_llm_pb2.CBTBotResponse(
                 cbtCategory=response.cbt_category,
                 consultationStage=response.consultation_stage,
