@@ -13,10 +13,8 @@ class MarkdownReader:
             with open(file_path, 'r', encoding='utf-8') as file:
                 return file.read()
         except FileNotFoundError:
-            error_message = f"Error: The file at {file_path} was not found."
-            logging.error(error_message)
-            return error_message
+            logging.error(f"Error: The file at {file_path} was not found.")
+            raise
         except Exception as e:
-            error_message = f"Error: {str(e)}"
-            logging.error(error_message)
-            return error_message
+            logging.error(f"Error: {str(e)}")
+            raise
