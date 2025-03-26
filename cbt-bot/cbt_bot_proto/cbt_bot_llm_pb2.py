@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x63\x62t_bot_llm.proto\x12\x07\x63\x62t_bot\"\x1e\n\x0b\x43hatRequest\x12\x0f\n\x07message\x18\x01 \x01(\t\";\n\x0c\x43hatResponse\x12+\n\ncbtDetails\x18\x01 \x01(\x0b\x32\x17.cbt_bot.CBTBotResponse\"\x89\x03\n\x0e\x43\x42TBotResponse\x12\x13\n\x0b\x63\x62tCategory\x18\x01 \x01(\t\x12\x19\n\x11\x63onsultationStage\x18\x02 \x01(\t\x12\x1b\n\x13triggeringSituation\x18\x03 \x01(\t\x12\x19\n\x11\x61utomaticThoughts\x18\x04 \x01(\t\x12\x10\n\x08\x65motions\x18\x05 \x03(\t\x12K\n\x12intensityOfEmotion\x18\x06 \x03(\x0b\x32/.cbt_bot.CBTBotResponse.IntensityOfEmotionEntry\x12\x19\n\x11underlyingBeliefs\x18\x07 \x01(\t\x12\x13\n\x0b\x63\x62tQuestion\x18\x08 \x03(\t\x12\x14\n\x0cuserResponse\x18\t \x01(\t\x12\x16\n\x0etherapistNotes\x18\n \x01(\t\x12\x17\n\x0f\x64\x65\x66\x61ultResponse\x18\x0b \x01(\t\x1a\x39\n\x17IntensityOfEmotionEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\x32\x44\n\rCBTBotService\x12\x33\n\x04\x43hat\x12\x14.cbt_bot.ChatRequest\x1a\x15.cbt_bot.ChatResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x63\x62t_bot_llm.proto\x12\x07\x63\x62t_bot\"/\n\x0b\x43hatRequest\x12\x0f\n\x07user_id\x18\x01 \x01(\x03\x12\x0f\n\x07message\x18\x02 \x01(\t\";\n\x0c\x43hatResponse\x12+\n\ncbtDetails\x18\x01 \x01(\x0b\x32\x17.cbt_bot.CBTBotResponse\"\x89\x03\n\x0e\x43\x42TBotResponse\x12\x13\n\x0b\x63\x62tCategory\x18\x01 \x01(\t\x12\x19\n\x11\x63onsultationStage\x18\x02 \x01(\t\x12\x1b\n\x13triggeringSituation\x18\x03 \x01(\t\x12\x19\n\x11\x61utomaticThoughts\x18\x04 \x01(\t\x12\x10\n\x08\x65motions\x18\x05 \x03(\t\x12K\n\x12intensityOfEmotion\x18\x06 \x03(\x0b\x32/.cbt_bot.CBTBotResponse.IntensityOfEmotionEntry\x12\x19\n\x11underlyingBeliefs\x18\x07 \x01(\t\x12\x13\n\x0b\x63\x62tQuestion\x18\x08 \x03(\t\x12\x14\n\x0cuserResponse\x18\t \x01(\t\x12\x16\n\x0etherapistNotes\x18\n \x01(\t\x12\x17\n\x0f\x64\x65\x66\x61ultResponse\x18\x0b \x01(\t\x1a\x39\n\x17IntensityOfEmotionEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\x32\x44\n\rCBTBotService\x12\x33\n\x04\x43hat\x12\x14.cbt_bot.ChatRequest\x1a\x15.cbt_bot.ChatResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -34,13 +34,13 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_CBTBOTRESPONSE_INTENSITYOFEMOTIONENTRY']._loaded_options = None
   _globals['_CBTBOTRESPONSE_INTENSITYOFEMOTIONENTRY']._serialized_options = b'8\001'
   _globals['_CHATREQUEST']._serialized_start=30
-  _globals['_CHATREQUEST']._serialized_end=60
-  _globals['_CHATRESPONSE']._serialized_start=62
-  _globals['_CHATRESPONSE']._serialized_end=121
-  _globals['_CBTBOTRESPONSE']._serialized_start=124
-  _globals['_CBTBOTRESPONSE']._serialized_end=517
-  _globals['_CBTBOTRESPONSE_INTENSITYOFEMOTIONENTRY']._serialized_start=460
-  _globals['_CBTBOTRESPONSE_INTENSITYOFEMOTIONENTRY']._serialized_end=517
-  _globals['_CBTBOTSERVICE']._serialized_start=519
-  _globals['_CBTBOTSERVICE']._serialized_end=587
+  _globals['_CHATREQUEST']._serialized_end=77
+  _globals['_CHATRESPONSE']._serialized_start=79
+  _globals['_CHATRESPONSE']._serialized_end=138
+  _globals['_CBTBOTRESPONSE']._serialized_start=141
+  _globals['_CBTBOTRESPONSE']._serialized_end=534
+  _globals['_CBTBOTRESPONSE_INTENSITYOFEMOTIONENTRY']._serialized_start=477
+  _globals['_CBTBOTRESPONSE_INTENSITYOFEMOTIONENTRY']._serialized_end=534
+  _globals['_CBTBOTSERVICE']._serialized_start=536
+  _globals['_CBTBOTSERVICE']._serialized_end=604
 # @@protoc_insertion_point(module_scope)

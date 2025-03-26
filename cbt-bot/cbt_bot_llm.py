@@ -9,7 +9,7 @@ from cbt_bot_model import CBTBotResponse
 class CBTBotLLM:
     llm: ChatGoogleGenerativeAI
     prompt: str
-    memory: ConversationBufferMemory
+    user_memories: dict
 
     def __init__(self):
         self.llm = ChatGoogleGenerativeAI(
@@ -19,19 +19,25 @@ class CBTBotLLM:
             google_api_key=Config.GOOGLE_API_KEY
         )
         self.prompt = MarkdownReader.read_file(Config.PROMPT_PATH)
-        self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+        self.user_memories = {}
 
-    def invoke(self, message: str):
+    def get_memory(self, user_id: str) -> ConversationBufferMemory:
+        if user_id not in self.user_memories:
+            self.user_memories[user_id] = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+        return self.user_memories[user_id]
+
+    def invoke(self, user_id: str, message: str):
+        memory = self.get_memory(user_id)
+
         # 기억된 대화를 포함하여 모델에 전달
-
         messages = [SystemMessage(content=self.prompt, role="system")]
-        messages.extend([AIMessage(content=m.content, role=m.type) for m in self.memory.chat_memory.messages])
+        messages.extend([AIMessage(content=m.content, role=m.type) for m in memory.chat_memory.messages])
         messages.append(HumanMessage(content=message, role="user"))
 
         response = self.llm.invoke(messages)
 
         try:
-            self.memory.save_context({"input": message}, {"output": response.content})
+            memory.save_context({"input": message}, {"output": response.content})
         except Exception as e:
             print(f"Error saving context: {e}")
         print(response.content)
