@@ -1,4 +1,5 @@
 import json
+import logging
 
 class JsonSerializer:
     @staticmethod
@@ -14,6 +15,11 @@ class JsonSerializer:
                 json_str = json_str[7:]
             if json_str.endswith("```"):
                 json_str = json_str[:-3]
+            print(json.loads(json_str.strip()))
             return  data_type(**json.loads(json_str.strip()))
         except json.JSONDecodeError as e:
-            print(f"JSON 디코딩 오류: {e}")
+            logging.error(f"JSON 디코딩 오류: {e}")
+            return None
+        except Exception as e:
+            logging.error(f"예상치 못한 오류: {e}")
+            return None

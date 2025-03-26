@@ -1,5 +1,6 @@
 import pickle
 import redis
+import logging
 from langchain.memory import ConversationBufferMemory
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
@@ -23,9 +24,9 @@ class CBTBotLLM:
         try:
             self.redis_client = redis.Redis(host=REDIS.HOST, port=REDIS.PORT, db=REDIS.DB)
             self.redis_client.ping()  # Redis 서버가 응답하는지 확인
-            print("✅ Redis 연결 성공!")
+            logging.info("✅ Redis 연결 성공!")
         except redis.ConnectionError as e:
-            print(f"❌ Redis 연결 실패: {e}")
+            logging.error(f"❌ Redis 연결 실패: {e}")
             raise
 
     def get_memory(self, user_id: str) -> ConversationBufferMemory:
@@ -37,9 +38,12 @@ class CBTBotLLM:
             try:
                 memory = pickle.loads(memory_data)  # 🔹 역직렬화
                 return memory
+            except pickle.PickleError as e:
+                logging.error(f"❌ Redis 데이터 역직렬화 실패: {e}")
             except Exception as e:
-                print(f"❌ Redis 데이터 역직렬화 실패: {e}")
+                logging.error(f"❌ 예상치 못한 오류: {e}")
 
+        logging.warning(f"⚠️ 사용자 {user_id}의 대화 기록 없음. 새로운 메모리 생성.")
         print(f"⚠️ 사용자 {user_id}의 대화 기록 없음. 새로운 메모리 생성.")
         return ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
@@ -48,8 +52,9 @@ class CBTBotLLM:
         try:
             memory_data = pickle.dumps(memory)  # 🔹 직렬화
             self.redis_client.set(f"{self.user_memories_prefix}{user_id}", memory_data)
+            logging.info(f"✅ 사용자 {user_id}의 대화 기록 저장 성공.")
         except Exception as e:
-            print(f"❌ 대화 기록 저장 실패: {e}")
+            logging.error(f"❌ 대화 기록 저장 실패: {e}")
 
     def invoke(self, user_id: str, message: str):
         """사용자 메시지를 받아 LLM을 호출하고 응답을 반환"""
@@ -84,9 +89,11 @@ class CBTBotLLM:
                     pipe.multi()
                     pipe.set(memory_key, memory_data)
                     pipe.execute()
+                    logging.info(f"✅ 사용자 {user_id}의 대화 기록 업데이트 성공.")
                     break
                 except redis.WatchError:
                     # 다른 클라이언트가 메모리를 수정한 경우 재시도
+                    logging.warning(f"⚠️ 사용자 {user_id}의 대화 기록 업데이트 충돌. 재시도 중...")
                     continue
 
         return JsonSerializer.from_json(CBTBotResponse, response.content)

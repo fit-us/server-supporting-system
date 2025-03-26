@@ -1,3 +1,5 @@
+import logging
+
 class MarkdownReader:
     @staticmethod
     def read_file(file_path: str) -> str:
@@ -11,6 +13,10 @@ class MarkdownReader:
             with open(file_path, 'r', encoding='utf-8') as file:
                 return file.read()
         except FileNotFoundError:
-            return f"Error: The file at {file_path} was not found."
+            error_message = f"Error: The file at {file_path} was not found."
+            logging.error(error_message)
+            return error_message
         except Exception as e:
-            return f"Error: {str(e)}"
+            error_message = f"Error: {str(e)}"
+            logging.error(error_message)
+            return error_message
