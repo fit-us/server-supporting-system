@@ -4,24 +4,24 @@ from langchain.memory import ConversationBufferMemory
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
 from utils.markdown_utils import MarkdownReader
-from config import Config
+from config import LLM,REDIS
 from utils.json_serializer import JsonSerializer
 from cbt_bot_model import CBTBotResponse
 
 class CBTBotLLM:
     def __init__(self):
         self.llm = ChatGoogleGenerativeAI(
-            model=Config.MODEL,
-            temperature=Config.TEMPERATURE,
-            max_output_tokens=Config.MAX_OUTPUT_TOKENS,
-            google_api_key=Config.GOOGLE_API_KEY
+            model=LLM.MODEL,
+            temperature=LLM.TEMPERATURE,
+            max_output_tokens=LLM.MAX_OUTPUT_TOKENS,
+            google_api_key=LLM.GOOGLE_API_KEY
         )
-        self.prompt = MarkdownReader.read_file(Config.PROMPT_PATH)
+        self.prompt = MarkdownReader.read_file(LLM.PROMPT_PATH)
         self.user_memories_prefix = "user_memory:"
 
         # ✅ Redis 연결 확인
         try:
-            self.redis_client = redis.Redis(host="localhost", port=6379, db=0)
+            self.redis_client = redis.Redis(host=REDIS.HOST, port=REDIS.PORT, db=REDIS.DB)
             self.redis_client.ping()  # Redis 서버가 응답하는지 확인
             print("✅ Redis 연결 성공!")
         except redis.ConnectionError as e:
