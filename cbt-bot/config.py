@@ -4,9 +4,14 @@ from dotenv import load_dotenv
 
 load_dotenv(dotenv_path=".env.dev")
 
-class Config:
+class LLM:
     GOOGLE_API_KEY = os.getenv("GEN_API_KEY")
-    MODEL = "gemini-1.5-flash"
-    TEMPERATURE = 0
-    MAX_OUTPUT_TOKENS = 10000
+    MODEL = os.getenv("LLM_MODEL")
+    TEMPERATURE = os.getenv("LLM_TEMPERATURE")
+    MAX_OUTPUT_TOKENS = os.getenv("LLM_MAX_OUTPUT_TOKENS")
     PROMPT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets/system-prompt.md")
+
+class REDIS:
+    HOST = os.getenv("REDIS_HOST")
+    PORT = os.getenv("REDIS_PORT")
+    DB = os.getenv("REDIS_DB")
