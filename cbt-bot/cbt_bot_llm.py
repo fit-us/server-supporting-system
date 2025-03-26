@@ -53,18 +53,40 @@ class CBTBotLLM:
 
     def invoke(self, user_id: str, message: str):
         """사용자 메시지를 받아 LLM을 호출하고 응답을 반환"""
-        memory = self.get_memory(user_id)
+        memory_key = f"{self.user_memories_prefix}{user_id}"
 
-        # 기억된 대화를 포함하여 모델에 전달
-        messages = [SystemMessage(content=self.prompt, role="system")]
-        messages.extend([AIMessage(content=m.content, role=m.type) for m in memory.chat_memory.messages])
-        messages.append(HumanMessage(content=message, role="user"))
+        # Redis 트랜잭션 시작
+        with self.redis_client.pipeline() as pipe:
+            while True:
+                try:
+                    # Redis에서 사용자 메모리 가져오기
+                    pipe.watch(memory_key)
+                    memory_data = pipe.get(memory_key)
 
-        # ✅ 동기 방식으로 모델 호출
-        response = self.llm.invoke(messages)
+                    if memory_data:
+                        memory = pickle.loads(memory_data)  # 🔹 역직렬화
+                    else:
+                        memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
-        # 대화 기록 저장
-        memory.save_context({"input": message}, {"output": response.content})
-        self.save_memory(user_id, memory)
+                    # 기억된 대화를 포함하여 모델에 전달
+                    messages = [SystemMessage(content=self.prompt, role="system")]
+                    messages.extend([AIMessage(content=m.content, role=m.type) for m in memory.chat_memory.messages])
+                    messages.append(HumanMessage(content=message, role="user"))
+
+                    # ✅ 동기 방식으로 모델 호출
+                    response = self.llm.invoke(messages)
+
+                    # 대화 기록 저장
+                    memory.save_context({"input": message}, {"output": response.content})
+                    memory_data = pickle.dumps(memory)  # 🔹 직렬화
+
+                    # Redis 트랜잭션 실행
+                    pipe.multi()
+                    pipe.set(memory_key, memory_data)
+                    pipe.execute()
+                    break
+                except redis.WatchError:
+                    # 다른 클라이언트가 메모리를 수정한 경우 재시도
+                    continue
 
         return JsonSerializer.from_json(CBTBotResponse, response.content)
