@@ -44,7 +44,6 @@ class CBTBotLLM:
                 logging.error(f"❌ 예상치 못한 오류: {e}")
 
         logging.warning(f"⚠️ 사용자 {user_id}의 대화 기록 없음. 새로운 메모리 생성.")
-        print(f"⚠️ 사용자 {user_id}의 대화 기록 없음. 새로운 메모리 생성.")
         return ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
     def save_memory(self, user_id: str, memory: ConversationBufferMemory):
