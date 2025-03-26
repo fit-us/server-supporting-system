@@ -7,7 +7,8 @@ service CBTBotService {
 }
 
 message ChatRequest {
-    string message = 1;
+    int64 user_id = 1;
+    string message = 2;
 }
 
 message ChatResponse {
