@@ -107,7 +107,7 @@ class CBTBotLLM:
 
                     # 기억된 대화를 포함하여 모델에 전달
                     messages = [SystemMessage(content=prompt, role="system")]
-                    # messages.extend([AIMessage(content=m.content, role=m.type) for m in memory.chat_memory.messages])
+                    messages.extend([AIMessage(content=m.content, role=m.type) for m in memory.chat_memory.messages])
                     messages.append(HumanMessage(content=message, role="user"))
 
                     response = ""
