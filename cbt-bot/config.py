@@ -9,7 +9,9 @@ class LLM:
     MODEL = os.getenv("LLM_MODEL")
     TEMPERATURE = os.getenv("LLM_TEMPERATURE")
     MAX_OUTPUT_TOKENS = os.getenv("LLM_MAX_OUTPUT_TOKENS")
-    PROMPT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets/system-prompt.md")
+    CONSULTATION_PROMPT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets/system-consultation-prompt.md")
+    CBT_PROMPT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets/system-cbt-prompt.md")
+    ANALYSIS_PROMPT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets/system-analysis-prompt.md")
 
 class REDIS:
     HOST = os.getenv("REDIS_HOST")
