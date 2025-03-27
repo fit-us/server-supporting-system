@@ -121,7 +121,7 @@ If the user wants to end the consultation, change the consultation step to the e
         "슬픔": 6
     },
     "underlyingBeliefs": ["나는 실수를 하면 무능하다고 생각한다.", "내가 부족하다는 이미지를 갖게 될까 두렵다."],
-    "userResponse": "사용자의응답",
+    "userRequest": "사용자의응답",
     "therapistNotes": "사용자가 과잉일반화된 사고로 자신을 지나치게 부정적으로 평가하고 있으며, 실수에 대한 두려움이 감정을 증폭시키고 있음."
 }
 ```
