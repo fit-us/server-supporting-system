@@ -15,6 +15,7 @@ class JsonSerializer:
                 json_str = json_str[7:]
             if json_str.endswith("```"):
                 json_str = json_str[:-3]
+            print("asdasd",data_type(**json.loads(json_str.strip())))
             return  data_type(**json.loads(json_str.strip()))
         except json.JSONDecodeError as e:
             logging.error(f"JSON 디코딩 오류: {e}")
