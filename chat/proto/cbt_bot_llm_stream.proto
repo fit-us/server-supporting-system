@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package cbt_bot;
+
+option go_package = ".";
+
+service CBTBotService {
+    rpc Chat (ChatRequest) returns (stream ChatResponse);
+}
+
+message ChatRequest {
+    int64 user_id = 1;
+    string message = 2;
+}
+
+message ChatResponse {
+    string consultationResponse = 1;
+    CBTQuestion cbtResponse = 2;
+    ConsultationAnalysisReport analysisResponse = 3;
+}
+
+
+message ConsultationAnalysisReport {
+    string cbtCategory = 1;
+    string consultationStage = 2;
+    string triggeringSituation = 3;
+    string automaticThoughts = 4;
+    repeated string emotions = 5;
+    map<string, int32> intensityOfEmotion = 6;
+    string underlyingBeliefs = 7;
+    string userResponse = 8;
+    string therapistNotes = 9;
+}
+
+message CBTQuestion {
+    string type = 1;
+    string question = 2;
+    repeated string choices = 3;
+}
+
+message CBTQuestions {
+    repeated CBTQuestion cbtQuestion = 1;
+}
