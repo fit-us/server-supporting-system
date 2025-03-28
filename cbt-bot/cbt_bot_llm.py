@@ -76,93 +76,60 @@ class CBTBotLLM:
 
         # 최대 재시도 횟수를 넘어서면 실패로 처리
         logging.error(f"❌ 사용자 {user_id}의 대화 기록 저장 실패. 재시도 횟수 초과.")
+    
+    def create_tasks(self, memory:ConversationBufferMemory, message: str):
+        try:
+            tasks = {
+                "consultation": self.invoke(self.prompts["consultation"], message, memory),
+                "cbt": self.invoke(self.prompts["cbt"], message, memory),
+                "analysis": self.invoke(self.prompts["analysis"], message, memory),
+            }
+            logging.info(f"Tasks 생성됨: {tasks}")  # 디버깅 로그 추가
+            return tasks
+        except KeyError as e:
+            logging.error(f"❌ 프롬프트 키가 누락되었습니다: {e}")
+            raise ValueError("필요한 프롬프트가 누락되었습니다.")
+        except Exception as e:
+            logging.error(f"❌ 프롬프트 작업 생성 중 오류 발생: {e}")
+            raise
 
     async def invoke_stream(self, user_id: str, message: str):
         """ 각 프롬프트(consultation, cbt, analysis)를 병렬 실행하여 응답을 스트리밍 반환 """
-        memory_key = f"{self.user_memories_prefix}{user_id}"
-        
         try:
             # Redis에서 메모리 가져오기
-            try:
-                memory_data = self.redis_client.get(memory_key)
-                if memory_data:
-                    memory = pickle.loads(memory_data)  # 🔹 역직렬화
-                else:
-                    memory = ConversationBufferMemory(memory_key=memory_key, return_messages=True)
-            except pickle.PickleError as e:
-                logging.error(f"❌ Redis 데이터 역직렬화 실패: {e}")
-                memory = ConversationBufferMemory(memory_key=memory_key, return_messages=True)
-            except redis.ConnectionError as e:
-                logging.error(f"❌ Redis 연결 실패: {e}")
-                raise RuntimeError("Redis 연결 실패로 인해 작업을 중단합니다.")
-            except Exception as e:
-                logging.error(f"❌ Redis에서 메모리를 가져오는 중 예상치 못한 오류 발생: {e}")
-                raise
-
+            memory = self.get_memory(user_id)
+            
             # 프롬프트별 작업 생성
-            try:
-                tasks = {
-                    "consultation": self.invoke(self.prompts["consultation"], message, memory),
-                    "cbt": self.invoke(self.prompts["cbt"], message, memory),
-                    "analysis": self.invoke(self.prompts["analysis"], message, memory),
-                }
-                logging.info(f"Tasks 생성됨: {tasks}")  # 디버깅 로그 추가
-            except KeyError as e:
-                logging.error(f"❌ 프롬프트 키가 누락되었습니다: {e}")
-                raise ValueError("필요한 프롬프트가 누락되었습니다.")
-            except Exception as e:
-                logging.error(f"❌ 프롬프트 작업 생성 중 오류 발생: {e}")
-                raise
+            tasks = self.create_tasks(memory, message)
 
             # 응답 모음 초기화
             collected_responses = {"consultation": "", "cbt": "", "analysis": "", "summarize": ""}
 
             # 🔹 병렬 실행
             for prompt_type, task in tasks.items():
-                try:
-                    logging.info(f"Task 실행 시작: {prompt_type}")
-                    async for chunk in task:
-                        collected_responses[prompt_type] += chunk
-                        if prompt_type == "consultation":
-                            yield (prompt_type, chunk)
-                            await asyncio.sleep(0)
-                except Exception as e:
-                    logging.error(f"❌ {prompt_type} 작업 실행 중 오류 발생: {e}")
-                    raise;
+                logging.info(f"Task 실행 시작: {prompt_type}")
+                async for chunk in task:
+                    collected_responses[prompt_type] += chunk
+                    if prompt_type == "consultation":
+                        yield (prompt_type, chunk)
+                        await asyncio.sleep(0)
                 # CBT와 분석 결과 JSON 변환
-                try:
-                    if prompt_type == "cbt":
-                        print("cbt",collected_responses[prompt_type])
-                        yield (prompt_type, JsonSerializer.from_json(CBTResponse, collected_responses[prompt_type]))
-                    elif prompt_type == "analysis":
-                        yield (prompt_type, JsonSerializer.from_json(AnalysisResponse, collected_responses[prompt_type]))
-                except Exception as e:
-                    logging.error(f"❌ {prompt_type} JSON 변환 중 예상치 못한 오류 발생: {e}")
-                    raise
+                if prompt_type == "cbt":
+                    print("cbt",collected_responses[prompt_type])
+                    yield (prompt_type, JsonSerializer.from_json(CBTResponse, collected_responses[prompt_type]))
+                elif prompt_type == "analysis":
+                    yield (prompt_type, JsonSerializer.from_json(AnalysisResponse, collected_responses[prompt_type]))
             # 요약 작업 실행
-            try:
-                async for chunk in self.summarize_result(
-                    self.prompts["summary"],
-                    collected_responses["consultation"] + collected_responses["cbt"] + collected_responses["analysis"]
-                ):
-                    collected_responses["summarize"] += chunk
-            except Exception as e:
-                logging.error(f"❌ 요약 작업 실행 중 오류 발생: {e}")
-                collected_responses["summarize"] = f"요약 작업 오류: {e}"
-
+            async for chunk in self.summarize_result(
+                self.prompts["summary"],
+                collected_responses["consultation"] + collected_responses["cbt"] + collected_responses["analysis"]
+            ):
+                collected_responses["summarize"] += chunk
+    
             # 메모리 저장
-            try:
-                memory.save_context({"input": message}, {"output": collected_responses["summarize"]})
-                memory_data = pickle.dumps(memory)  # 🔹 직렬화
-                self.save_memory(user_id, memory)
-                logging.info(f"✅ 사용자 {user_id}의 대화 기록 업데이트 성공.")
-            except pickle.PickleError as e:
-                logging.error(f"❌ 메모리 직렬화 실패: {e}")
-            except redis.ConnectionError as e:
-                logging.error(f"❌ Redis 저장 중 연결 오류 발생: {e}")
-            except Exception as e:
-                logging.error(f"❌ 메모리 저장 중 예상치 못한 오류 발생: {e}")
-
+            memory.save_context({"input": message}, {"output": collected_responses["summarize"]})
+            self.save_memory(user_id, memory)
+            
         except Exception as e:
             logging.error(f"invoke_stream 처리 중 치명적인 오류 발생: {e}")
             raise
