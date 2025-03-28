@@ -58,7 +58,6 @@ class CBTBotServicer(cbt_bot_llm_stream_pb2_grpc.CBTBotServiceServicer):
                         yield response
                 elif prompt_type == "analysis":
                     yield await self.handle_analysis(chunk)
-
                 await asyncio.sleep(0)
         except Exception as e:
             logging.error(f"Chat 처리 중 오류 발생: {e}")

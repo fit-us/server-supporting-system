@@ -12,6 +12,7 @@ class LLM:
     CONSULTATION_PROMPT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets/system-consultation-prompt.md")
     CBT_PROMPT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets/system-cbt-prompt.md")
     ANALYSIS_PROMPT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets/system-analysis-prompt.md")
+    SUMMARY_PROMPT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets/system-summary-prompt.md")
 
 class REDIS:
     HOST = os.getenv("REDIS_HOST")
