@@ -52,20 +52,30 @@ class CBTBotLLM:
         logging.warning(f"⚠️ 사용자 {user_id}의 대화 기록 없음. 새로운 메모리 생성.")
         return ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
-    def save_memory(self, user_id: str, memory: ConversationBufferMemory):
+    def save_memory(self, user_id: str, memory: ConversationBufferMemory, max_retries: int = 3):
         memory_key = f"{self.user_memories_prefix}{user_id}"
-        try:
-            memory_data = pickle.dumps(memory)
-            with self.redis_client.pipeline() as pipe:
-                pipe.watch(memory_key)
-                pipe.multi()
-                pipe.set(memory_key, memory_data)
-                pipe.execute()
-            logging.info(f"✅ 사용자 {user_id}의 대화 기록 저장 성공.")
-        except redis.WatchError:
-            logging.warning(f"⚠️ 사용자 {user_id}의 대화 기록 저장 충돌. 재시도 필요.")
-        except Exception as e:
-            logging.error(f"❌ 대화 기록 저장 실패: {e}")
+        retries = 0
+        
+        while retries < max_retries:
+            try:
+                memory_data = pickle.dumps(memory)
+                with self.redis_client.pipeline() as pipe:
+                    pipe.watch(memory_key)
+                    pipe.multi()
+                    pipe.set(memory_key, memory_data)
+                    pipe.execute()
+                logging.info(f"✅ 사용자 {user_id}의 대화 기록 저장 성공.")
+                return  
+            except redis.WatchError:
+                retries += 1
+                logging.warning(f"⚠️ 사용자 {user_id}의 대화 기록 저장 충돌. 재시도 {retries}/{max_retries}...")
+                asyncio.sleep(1)
+            except Exception as e:
+                logging.error(f"❌ 대화 기록 저장 실패: {e}")
+                break 
+
+        # 최대 재시도 횟수를 넘어서면 실패로 처리
+        logging.error(f"❌ 사용자 {user_id}의 대화 기록 저장 실패. 재시도 횟수 초과.")
 
     async def async_invoke(self, messages):
         # invoke가 동기적이라면 이를 비동기적으로 호출하기 위한 래핑
