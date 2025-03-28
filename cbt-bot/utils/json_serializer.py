@@ -12,12 +12,17 @@ class JsonSerializer:
         if not isinstance(data_type, type):
             raise TypeError("data_type must be a class.")     
         try:
-            json_str = re.search(r'```json\n(.*?)\n```', json_str, re.DOTALL).group(1)
-            if json_str.startswith("```json"):
+            # 정규 표현식으로 JSON 문자열 추출
+            match = re.search(r'```json\n(.*?)\n```', json_str, re.DOTALL)
+            if match:
+                json_str = match.group(1)  # JSON 내용 추출
+            elif json_str.startswith("```json"):
                 json_str = json_str[7:]
-            if json_str.endswith("```"):
+            elif json_str.endswith("```"):
                 json_str = json_str[:-3]
-            return  data_type(**json.loads(json_str.strip()))
+
+            # JSON 파싱 후, 해당 data_type의 객체로 변환
+            return data_type(**json.loads(json_str.strip()))
         except json.JSONDecodeError as e:
             logging.error(f"JSON 디코딩 오류: {e} - {data_type}{json_str}")
             return None
