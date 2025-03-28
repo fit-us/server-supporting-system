@@ -95,6 +95,8 @@ If the user wants to end the consultation, change the consultation step to the e
 }
 ```
 
+-   Json 이외에 다른 어떤 구조도 포함될 수 없다.
+
 ### 설명:
 
 1. **`cbtQuestion`**:
