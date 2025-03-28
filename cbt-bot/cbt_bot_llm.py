@@ -80,7 +80,7 @@ class CBTBotLLM:
             if memory_data:
                 memory = pickle.loads(memory_data)  # 🔹 역직렬화
             else:
-                memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+                memory = ConversationBufferMemory(memory_key=memory_key, return_messages=True)
             tasks = {
                 "consultation": self.invoke(self.prompts["consultation"], message, memory),
                 "cbt": self.invoke(self.prompts["cbt"], message, memory),
